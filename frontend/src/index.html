@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyTracker - Трекер привычек</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Header with Theme Toggle -->
+        <header class="app-header">
+            <h1 id="app-title">MyTracker</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+        </header>
+
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content active">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img src="https://api.dicebear.com/7.x/pixel-art/svg?seed=Ivan" alt="Avatar" id="profile-avatar">
+                    <button class="avatar-change" onclick="changeAvatar()">📷</button>
+                </div>
+                <h2 id="display-name">Данил Пряхин</h2>
+                <p id="user-age" class="age-text"></p>
+            </div>
+            
+            <div class="form-group">
+                <label>ИМЯ</label>
+                <input type="text" id="input-name" value="Данил Пряхин" onchange="updateProfile()">
+            </div>
+            
+            <div class="form-group">
+                <label>О СЕБЕ</label>
+                <textarea id="input-about" rows="2" onchange="updateProfile()">Типа программист</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>ДЕНЬ РОЖДЕНИЯ</label>
+                <input type="date" id="input-birthday" onchange="updateProfile()">
+            </div>
+
+            <div class="form-group">
+                <label>ЦЕЛИ НА ДЕНЬ</label>
+                <div class="goals-container">
+                    <div class="goal-item">
+                        <span>💧 Вода:</span>
+                        <input type="number" id="goal-water" value="2" placeholder="л">
+                        <span>л</span>
+                    </div>
+                    <div class="goal-item">
+                        <span>🏃 Спорт:</span>
+                        <input type="number" id="goal-sport" value="30" placeholder="мин">
+                        <span>мин</span>
+                    </div>
+                    <div class="goal-item">
+                        <span>📚 Чтение:</span>
+                        <input type="number" id="goal-reading" value="20" placeholder="мин">
+                        <span>мин</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn-primary" onclick="saveData()">💾 Сохранить всё</button>
+            <button class="btn-secondary" onclick="exportData()">📤 Экспорт данных</button>
+        </div>
+
+        <!-- Notes Tab -->
+        <div id="notes-tab" class="tab-content">
+            <div class="search-bar">
+                <input type="text" id="search-notes" placeholder="🔍 Поиск заметок..." oninput="searchNotes()">
+            </div>
+            
+            <div class="filter-sort">
+                <select id="sort-notes" onchange="sortNotes()">
+                    <option value="newest">Сначала новые</option>
+                    <option value="oldest">Сначала старые</option>
+                    <option value="alpha">По алфавиту</option>
+                </select>
+            </div>
+
+            <div class="note-form">
+                <input type="text" id="note-title" placeholder="Заголовок" class="input-field">
+                <textarea id="note-text" placeholder="Текст заметки..." rows="3" class="input-field"></textarea>
+                
+                <div class="note-options">
+                    <select id="note-category" class="note-select">
+                        <option value="personal">📝 Личное</option>
+                        <option value="work">💼 Работа</option>
+                        <option value="ideas">💡 Идеи</option>
+                        <option value="shopping">🛒 Покупки</option>
+                    </select>
+                    
+                    <select id="note-priority" class="note-select">
+                        <option value="normal">⚪ Обычная</option>
+                        <option value="important">🔴 Важная</option>
+                    </select>
+                </div>
+                
+                <div class="button-row">
+                    <button class="btn-outline" onclick="setListType('bullet')">• Маркированный</button>
+                    <button class="btn-outline" onclick="setListType('number')">1. Нумерованный</button>
+                </div>
+                
+                <button class="btn-primary" onclick="addNote()">➕ Добавить заметку</button>
+            </div>
+            
+            <div id="notes-list" class="notes-list"></div>
+        </div>
+
+        <!-- Habits Tab -->
+        <div id="habits-tab" class="tab-content">
+            <div class="habits-header">
+                <div>
+                    <h3>Сегодня</h3>
+                    <span id="current-date" class="date-text"></span>
+                </div>
+                <div class="streak-badge">
+                    🔥 <span id="current-streak">0</span> дней
+                </div>
+            </div>
+
+            <div id="habits-container">
+                <!-- Water Habit -->
+                <div class="habit-card" data-habit="water">
+                    <div class="habit-header">
+                        <div class="habit-info">
+                            <span class="habit-icon">💧</span>
+                            <span class="habit-name">Вода</span>
+                        </div>
+                        <div class="habit-stats">
+                            <span class="habit-current" id="water-current">0.5 л</span>
+                            <span class="habit-goal">/ 2 л</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="water-progress" style="width: 25%"></div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input type="number" id="water-input" placeholder="0.5" step="0.1" class="habit-input">
+                        <span class="unit">л</span>
+                        <button class="btn-add" onclick="addHabitValue('water')">+</button>
+                        <button class="btn-reset" onclick="resetHabit('water')">↺</button>
+                    </div>
+                </div>
+                
+                <!-- Sport Habit -->
+                <div class="habit-card" data-habit="sport">
+                    <div class="habit-header">
+                        <div class="habit-info">
+                            <span class="habit-icon">🏃</span>
+                            <span class="habit-name">Спорт</span>
+                        </div>
+                        <div class="habit-stats">
+                            <span class="habit-current" id="sport-current">10 мин</span>
+                            <span class="habit-goal">/ 30 мин</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="sport-progress" style="width: 33%"></div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input type="number" id="sport-input" placeholder="15" class="habit-input">
+                        <span class="unit">мин</span>
+                        <button class="btn-add" onclick="addHabitValue('sport')">+</button>
+                        <button class="btn-reset" onclick="resetHabit('sport')">↺</button>
+                    </div>
+                </div>
+                
+                <!-- Reading Habit -->
+                <div class="habit-card" data-habit="reading">
+                    <div class="habit-header">
+                        <div class="habit-info">
+                            <span class="habit-icon">📚</span>
+                            <span class="habit-name">Чтение</span>
+                        </div>
+                        <div class="habit-stats">
+                            <span class="habit-current" id="reading-current">1 мин</span>
+                            <span class="habit-goal">/ 20 мин</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="reading-progress" style="width: 5%"></div>
+                    </div>
+                    <div class="habit-input-row">
+                        <input type="number" id="reading-input" placeholder="30" class="habit-input">
+                        <span class="unit">мин</span>
+                        <button class="btn-add" onclick="addHabitValue('reading')">+</button>
+                        <button class="btn-reset" onclick="resetHabit('reading')">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Custom Habit -->
+            <div class="add-custom-habit">
+                <h4>➕ Добавить привычку</h4>
+                <input type="text" id="custom-habit-name" placeholder="Название привычки" class="input-field">
+                <div class="custom-habit-settings">
+                    <input type="text" id="custom-habit-icon" placeholder="🎯" class="habit-icon-input">
+                    <input type="text" id="custom-habit-unit" placeholder="ед.изм" class="habit-unit-input">
+                    <input type="number" id="custom-habit-goal" placeholder="Цель" class="habit-goal-input">
+                </div>
+                <button class="btn-primary" onclick="addCustomHabit()">Добавить</button>
+            </div>
+            
+            <button class="btn-primary" onclick="saveDayProgress()">✅ Сохранить прогресс дня</button>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="stats-tab" class="tab-content">
+            <div class="stats-period">
+                <button class="period-btn active" onclick="setPeriod('week')">Неделя</button>
+                <button class="period-btn" onclick="setPeriod('month')">Месяц</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="stat-streak">0</div>
+                    <div class="stat-label">дней подряд</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💧</div>
+                    <div class="stat-value" id="stat-water">0.5 л</div>
+                    <div class="stat-label">всего воды</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value" id="stat-notes">0</div>
+                    <div class="stat-label">заметок</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏃</div>
+                    <div class="stat-value" id="stat-sport">10 мин</div>
+                    <div class="stat-label">спорта</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-value" id="stat-reading">1 мин</div>
+                    <div class="stat-label">чтения</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="stat-achievements">0</div>
+                    <div class="stat-label">достижений</div>
+                </div>
+            </div>
+
+            <!-- Weekly Chart -->
+            <div class="chart-container">
+                <h4>📊 Прогресс за неделю</h4>
+                <div class="weekly-chart" id="weekly-chart">
+                    <!-- Chart will be generated by JS -->
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="achievements-section">
+                <h4>🏆 Достижения</h4>
+                <div class="achievements-grid" id="achievements-list">
+                    <div class="achievement" data-unlocked="false">
+                        <span class="achievement-icon">💧</span>
+                        <span class="achievement-name">Водный чемпион</span>
+                        <span class="achievement-desc">Выпей 10л воды</span>
+                    </div>
+                    <div class="achievement" data-unlocked="false">
+                        <span class="achievement-icon">🔥</span>
+                        <span class="achievement-name">Серия 7 дней</span>
+                        <span class="achievement-desc">Неделя без пропусков</span>
+                    </div>
+                    <div class="achievement" data-unlocked="false">
+                        <span class="achievement-icon">📝</span>
+                        <span class="achievement-name">Писатель</span>
+                        <span class="achievement-desc">10 заметок</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="day-selector">
+                <h4>📅 Выберите день</h4>
+                <div class="days-row" id="days-row">
+                    <!-- Days generated by JS -->
+                </div>
+            </div>
+            
+            <div class="notes-for-day">
+                <h4>Заметки за <span id="selected-date-display"></span></h4>
+                <div id="day-notes-list" class="day-notes-list"></div>
+            </div>
+
+            <button class="btn-secondary" onclick="clearAllData()">🗑️ Очистить все данные</button>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="switchTab('profile', this)">
+                <span class="nav-icon">👤</span>
+                <span>Профиль</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('notes', this)">
+                <span class="nav-icon">📝</span>
+                <span>Заметки</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('habits', this)">
+                <span class="nav-icon">✅</span>
+                <span>Привычки</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('stats', this)">
+                <span class="nav-icon">📊</span>
+                <span>Статистика</span>
+            </button>
+        </nav>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
