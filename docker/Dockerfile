@@ -4,7 +4,7 @@ COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 WORKDIR /usr/share/nginx/html
 
 # Копируем содержимое src прямо в корень
-COPY frontend/src/. ./
+COPY public/. ./
 # Копируем папку public как есть
 COPY frontend/public ./public
 
