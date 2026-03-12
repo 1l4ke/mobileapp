@@ -1,0 +1,13 @@
+{
+  "name": "smart-dashboard",
+  "version": "1.0.0",
+  "description": "PWA Smart Dashboard Architecture",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "npx http-server public",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["pwa", "spa", "architecture"],
+  "author": "Student",
+  "license": "MIT"
+}
