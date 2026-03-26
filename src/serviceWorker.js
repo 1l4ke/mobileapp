@@ -1,34 +1,31 @@
-const CACHE_NAME = 'my-day-v1';
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/script.js',
-    '/public/manifest.json',
-    '/public/192.png',
-    '/public/512.png',
-    '/public/1080.png',
-    '/public/1920.png'
-];
+const CACHE_NAME = 'dashboard-v1';
 
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(urlsToCache))
+// Кэшируем ТОЛЬКО index.html
+self.addEventListener('install', e => {
+    self.skipWaiting();
+    e.waitUntil(
+        caches.open(CACHE_NAME).then(cache => {
+            return cache.add('/public/index.html');
+        })
     );
 });
 
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => response || fetch(event.request))
-    );
-});
-
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(keys => Promise.all(
-            keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-        ))
-    );
+self.addEventListener('fetch', e => {
+    // ТОЛЬКО index.html и SPA routes
+    if (e.request.destination === 'document' || 
+        e.request.url.includes('/tasks') || 
+        e.request.url.includes('/notes') ||
+        e.request.url.includes('/tracker')) {
+        
+        e.respondWith(
+            caches.open(CACHE_NAME).then(cache => {
+                return cache.match('/public/index.html').then(cached => {
+                    return cached || fetch(e.request);
+                });
+            })
+        );
+    } else {
+        // ВСЁ ОСТАЛЬНОЕ — ПРОСТО СЕТЬ (JS/CSS/API)
+        e.respondWith(fetch(e.request));
+    }
 });
