@@ -286,3 +286,116 @@ body {
       font-size: 0.9rem;
   }
 }
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--color-surface);
+}
+
+.auth-card {
+  max-width: 400px;
+  width: 100%;
+  padding: 3rem 2rem;
+  border-radius: 1rem;
+  background: var(--color-surface-2);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+
+.auth-tabs {
+  display: flex;
+  margin: 2rem 0;
+  gap: 1rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  background: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+#auth-submit {
+  width: 100%;
+  padding: 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#auth-message {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+}
+
+#auth-message:empty { display: none; }
+.notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.notes-controls { display: flex; gap: 1rem; }
+.notes-search { padding: 0.75rem 1rem; border: 2px solid #ddd; border-radius: 8px; }
+.notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.note-card { padding: 1.5rem; border-radius: 12px; border: 1px solid #e5e7eb; background: white; cursor: pointer; transition: all 0.2s; }
+.note-card:hover { box-shadow: 0 10px 25px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.note-preview { font-size: 1.1rem; line-height: 1.5; margin-bottom: 1rem; }
+.note-meta { display: flex; justify-content: space-between; align-items: center; color: #6b7280; font-size: 0.9rem; }
+.note-actions { display: flex; gap: 0.5rem; }
+.note-actions button { padding: 0.25rem 0.5rem; border: none; background: none; cursor: pointer; border-radius: 4px; }
+.note-editor textarea { width: 100%; min-height: 200px; padding: 1rem; border: 2px solid #ddd; border-radius: 8px; resize: vertical; font-family: inherit; font-size: 1rem; }
+.editor-actions { display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; }
+.tracker-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.streak-display { text-align: center; }
+.streak-badge { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 0.5rem 1.5rem; border-radius: 999px; font-weight: 600; margin-top: 0.5rem; display: inline-block; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.stat-card { text-align: center; padding: 1.5rem; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.stat-number { font-size: 2.5rem; font-weight: 700; color: #6366f1; }
+.entries-list { display: flex; flex-direction: column; gap: 1rem; }
+.entry-item { padding: 1rem 1.5rem; border-radius: 12px; border-left: 4px solid; display: flex; gap: 1rem; align-items: center; }
+.entry-item.success { border-left-color: #10b981; background: #ecfdf5; }
+.entry-item.skip { border-left-color: #f59e0b; background: #fef3c7; }
+.entry-item.fail { border-left-color: #ef4444; background: #fef2f2; }
+.form-row { display: flex; gap: 1rem; }
+.form-row input, .form-row select { flex: 1; }
+#progress-chart { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white; }

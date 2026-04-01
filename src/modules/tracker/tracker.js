@@ -1,110 +1,218 @@
-console.log('📈 TRACKER OK');
-
 class TrackerModule {
-    constructor() {
-        this.stats = {};
-    }
+  constructor() {
+    this.entries = JSON.parse(localStorage.getItem('trackerEntries')) || [];
+    this.streak = this.calculateStreak();
+  }
+
+  async init() {
+    this.save();
+  }
+
+  render(container) {
+    container.innerHTML = `
+      <div class="tracker-header">
+        <div class="streak-display">
+          <h2>🔥 Стрик: <span id="streak-count">${this.streak}</span> дней</h2>
+          <div class="streak-badge">Продолжай!</div>
+        </div>
+        <button class="add-entry-btn">➕ Добавить день</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Всего дней</h3>
+          <div class="stat-number">${this.entries.length}</div>
+        </div>
+        <div class="stat-card">
+          <h3>Успешных</h3>
+          <div class="stat-number">${this.entries.filter(e => e.success).length}</div>
+        </div>
+        <div class="stat-card">
+          <h3>Уровень</h3>
+          <div class="stat-number level">${Math.floor(this.entries.filter(e => e.success).length / 10)}</div>
+        </div>
+      </div>
+
+      <canvas id="progress-chart" width="400" height="200"></canvas>
+
+      <div class="entries-list">
+        <!-- Динамически -->
+      </div>
+
+      <div class="entry-form" style="display:none;">
+        <div class="form-row">
+          <input id="entry-date" type="date" />
+          <select id="entry-success">
+            <option value="success">✅ Успех</option>
+            <option value="fail">❌ Провал</option>
+            <option value="skip">⏭️ Пропуск</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <textarea id="entry-notes" placeholder="Заметки за день..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button id="entry-save">Сохранить</button>
+          <button id="entry-cancel">Отмена</button>
+        </div>
+      </div>
+    `;
+
+    this.renderEntries();
+    this.renderChart();
+    this.bindEvents();
+  }
+
+  renderEntries() {
+    const list = document.querySelector('.entries-list');
+    const recent = this.entries.slice(-7).reverse(); // Последние 7 дней
+
+    list.innerHTML = recent.map((entry, i) => `
+      <div class="entry-item ${entry.success ? 'success' : entry.skip ? 'skip' : 'fail'}">
+        <div class="entry-date">${new Date(entry.date).toLocaleDateString()}</div>
+        <div class="entry-status">
+          ${entry.success ? '✅' : entry.skip ? '⏭️' : '❌'}
+          ${entry.success ? 'Успех' : entry.skip ? 'Пропуск' : 'Провал'}
+        </div>
+        ${entry.notes ? `<div class="entry-notes">${entry.notes}</div>` : ''}
+      </div>
+    `).join('') || '<p class="empty-state">Начни трекить привычки!</p>';
+  }
+
+  renderChart() {
+    const canvas = document.getElementById('progress-chart');
+    const ctx = canvas.getContext('2d');
     
-    async init() {
-        const tasks = await window.DataService.getTasks();
-        const notes = await window.DataService.getNotes();
-        
-        this.stats = {
-            totalTasks: tasks.length,
-            completedTasks: tasks.filter(t => t.status === 'completed').length,
-            totalNotes: notes.length,
-            taskTypes: {
-                health: tasks.filter(t => t.type === 'health').length,
-                household: tasks.filter(t => t.type === 'household').length,
-                work: tasks.filter(t => t.type === 'work').length
-            },
-            streak: Math.min(this.completedTasks, 7),  // Макс 7 дней
-            points: this.completedTasks * 15  // 15 очков за задачу
-        };
-        
-        console.log('📈 Stats:', this.stats);
+    // Данные за 30 дней
+    const days = 30;
+    const data = [];
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const entry = this.entries.find(e => new Date(e.date).toDateString() === date.toDateString());
+      data.push(entry?.success ? 1 : 0);
     }
+
+    // График
+    const maxHeight = 150;
+    const barWidth = canvas.width / days - 2;
     
-    render(container) {
-        container.innerHTML = `
-            <div style="max-width:1000px;margin:0 auto;padding:2rem">
-                <div style="text-align:center;margin-bottom:3rem">
-                    <h1 style="font-size:3rem;margin:0;color:#1f2937">📈 Твой прогресс</h1>
-                    <p style="color:#6b7280;font-size:1.2rem;margin:1rem 0">Статистика за всё время</p>
-                    
-                    <!-- Level badge -->
-                    <div style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:white;padding:1rem 2rem;border-radius:50px;font-size:1.3rem;font-weight:bold;box-shadow:0 10px 30px rgba(16,185,129,0.4);margin:1rem 0">
-                        Уровень ${Math.floor(this.stats.points / 100) + 1}
-                    </div>
-                </div>
-                
-                <!-- Stats grid -->
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-bottom:3rem">
-                    <div style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);text-align:center">
-                        <div style="font-size:3.5rem;color:#3b82f6;margin-bottom:1rem">${this.stats.totalTasks}</div>
-                        <div style="font-size:1.2rem;color:#1f2937;font-weight:600">Задач всего</div>
-                        <div style="color:#10b981;font-size:1.1rem;font-weight:bold">${this.stats.completedTasks} выполнено</div>
-                    </div>
-                    
-                    <div style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);text-align:center">
-                        <div style="font-size:3.5rem;color:#10b981;margin-bottom:1rem">${this.stats.totalNotes}</div>
-                        <div style="font-size:1.2rem;color:#1f2937;font-weight:600">Заметок</div>
-                        <div style="color:#6b7280;font-size:1rem">Быстрые записи</div>
-                    </div>
-                    
-                    <div style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);text-align:center">
-                        <div style="font-size:3.5rem;color:#f59e0b;margin-bottom:1rem">${this.stats.streak}</div>
-                        <div style="font-size:1.2rem;color:#1f2937;font-weight:600">Серия дней</div>
-                        <div style="color:#f59e0b;font-size:1.1rem;font-weight:bold">Продолжай! 🔥</div>
-                    </div>
-                    
-                    <div style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);text-align:center">
-                        <div style="font-size:3.5rem;color:#6366f1;margin-bottom:1rem">${this.stats.points}</div>
-                        <div style="font-size:1.2rem;color:#1f2937;font-weight:600">Очков</div>
-                        <div style="color:#6b7280;font-size:1rem">За все задачи</div>
-                    </div>
-                </div>
-                
-                <!-- Progress bars -->
-                <div style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1)">
-                    <h3 style="margin-top:0;color:#1f2937">Типы задач</h3>
-                    <div style="display:flex;flex-direction:column;gap:1rem">
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">
-                                <span>💪 Здоровье</span>
-                                <span>${this.stats.taskTypes.health} задач</span>
-                            </div>
-                            <div style="height:12px;background:#e5e7eb;border-radius:6px;overflow:hidden">
-                                <div style="height:100%;background:#10b981;width:${Math.min(this.stats.taskTypes.health*10,100)}%;transition:width 0.5s"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">
-                                <span>🏠 Дом</span>
-                                <span>${this.stats.taskTypes.household} задач</span>
-                            </div>
-                            <div style="height:12px;background:#e5e7eb;border-radius:6px;overflow:hidden">
-                                <div style="height:100%;background:#f59e0b;width:${Math.min(this.stats.taskTypes.household*10,100)}%;transition:width 0.5s"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem">
-                                <span>💼 Работа</span>
-                                <span>${this.stats.taskTypes.work || 0} задач</span>
-                            </div>
-                            <div style="height:12px;background:#e5e7eb;border-radius:6px;overflow:hidden">
-                                <div style="height:100%;background:#6366f1;width:${Math.min((this.stats.taskTypes.work||0)*10,100)}%;transition:width 0.5s"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    data.forEach((value, i) => {
+      const barHeight = value * maxHeight;
+      const x = i * (barWidth + 2);
+      
+      ctx.fillStyle = value ? '#10b981' : '#e5e7eb';
+      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+      
+      // Стрик highlight
+      if (i === data.length - this.streak && this.streak > 0) {
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(x - 1, canvas.height - maxHeight - 1, barWidth + 2, maxHeight + 2);
+      }
+    });
+  }
+
+  bindEvents() {
+    document.querySelector('.add-entry-btn').onclick = () => this.showEditor();
+
+    document.querySelector('#entry-save').onclick = () => this.saveEntry();
+    document.querySelector('#entry-cancel').onclick = () => this.hideEditor();
+
+    document.querySelector('.entries-list').addEventListener('click', (e) => {
+      const item = e.target.closest('.entry-item');
+      if (item && e.target.closest('.delete-entry')) {
+        const index = parseInt(item.dataset.index);
+        this.deleteEntry(index);
+      }
+    });
+  }
+
+  showEditor(editIndex = null) {
+    this.editingIndex = editIndex;
+    const form = document.querySelector('.entry-form');
+    form.style.display = 'block';
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('entry-date').value = editIndex !== null ? 
+      this.entries[editIndex].date.split('T')[0] : today;
+    
+    if (editIndex !== null) {
+      const entry = this.entries[editIndex];
+      document.getElementById('entry-success').value = entry.success ? 'success' : entry.skip ? 'skip' : 'fail';
+      document.getElementById('entry-notes').value = entry.notes || '';
     }
+  }
+
+  hideEditor() {
+    document.querySelector('.entry-form').style.display = 'none';
+    this.clearEditor();
+  }
+
+  saveEntry() {
+    const date = document.getElementById('entry-date').value;
+    const status = document.getElementById('entry-success').value;
+    const notes = document.getElementById('entry-notes').value.trim();
+
+    const entry = { date: date + 'T00:00:00Z', success: status === 'success', skip: status === 'skip', notes };
+
+    if (this.editingIndex !== null) {
+      this.entries[this.editingIndex] = entry;
+    } else {
+      this.entries.push(entry);
+      this.entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+    }
+
+    this.streak = this.calculateStreak();
+    this.save();
+    this.renderEntries();
+    this.renderChart();
+    this.hideEditor();
+  }
+
+  deleteEntry(index) {
+    if (confirm('Удалить запись?')) {
+      this.entries.splice(index, 1);
+      this.streak = this.calculateStreak();
+      this.save();
+      this.renderEntries();
+      this.renderChart();
+    }
+  }
+
+  calculateStreak() {
+    let streak = 0;
+    const today = new Date().toDateString();
+    
+    for (let i = this.entries.length - 1; i >= 0; i--) {
+      const entryDate = new Date(this.entries[i].date).toDateString();
+      
+      if (this.entries[i].success && this.isConsecutive(today, entryDate, streak)) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  isConsecutive(today, entryDate, streak) {
+    const daysDiff = (new Date(today) - new Date(entryDate)) / (1000 * 60 * 60 * 24);
+    return daysDiff === streak;
+  }
+
+  clearEditor() {
+    document.getElementById('entry-date').value = '';
+    document.getElementById('entry-success').value = 'success';
+    document.getElementById('entry-notes').value = '';
+  }
+
+  save() {
+    localStorage.setItem('trackerEntries', JSON.stringify(this.entries));
+    document.getElementById('streak-count').textContent = this.streak;
+  }
 }
 
-window.TrackerModule = new TrackerModule();
-window.Core.registerModule('tracker', window.TrackerModule);
-console.log('✅ Tracker готов');
+window.Core.registerModule('tracker', new TrackerModule());

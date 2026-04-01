@@ -1,26 +1,9 @@
 FROM nginx:alpine
 
-# Устанавливаем curl для healthcheck
-RUN apk add --no-cache curl
+# Копируем ВСЁ в root
+COPY public/ /usr/share/nginx/html/public/
+COPY src/ /usr/share/nginx/html/src/
+COPY manifest.json /usr/share/nginx/html/manifest.json
 
-# Копируем конфигурацию nginx
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Создаём рабочую директорию
-WORKDIR /usr/share/nginx/html
-
-# Копируем все файлы приложения
-COPY public/. ./
-COPY src/. ./src/
-
-# Устанавливаем правильные права
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chmod -R 755 /usr/share/nginx/html
-
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
-
-EXPOSE 80
-
+EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]

@@ -1,80 +1,157 @@
-console.log('📔 NOTES OK');
-
 class NotesModule {
-    constructor() {
-        this.notes = [];
-    }
+  constructor() {
+    this.notes = JSON.parse(localStorage.getItem('notes')) || [];
+  }
+
+  async init() {
+    this.save();
+  }
+
+  render(container) {
+    container.innerHTML = `
+      <div class="notes-header">
+        <h2>📔 Заметки <span class="notes-count">(${this.notes.length})</span></h2>
+        <div class="notes-controls">
+          <input id="notes-search" placeholder="🔍 Поиск заметок..." />
+          <button class="add-note-btn">➕ Новая заметка</button>
+        </div>
+      </div>
+      
+      <div class="notes-grid">
+        <!-- Заметки рендерятся динамически -->
+      </div>
+      
+      <div class="note-editor" style="display:none;">
+        <textarea id="note-content" placeholder="Напиши заметку..."></textarea>
+        <div class="editor-actions">
+          <button id="note-save">💾 Сохранить</button>
+          <button id="note-cancel">❌ Отмена</button>
+        </div>
+      </div>
+    `;
+
+    this.renderNotes();
+    this.bindEvents();
+  }
+
+  renderNotes(filter = '') {
+    const grid = document.querySelector('.notes-grid');
+    const filtered = this.notes.filter(note => 
+      note.content.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    grid.innerHTML = filtered.map((note, i) => `
+      <div class="note-card" data-index="${i}">
+        <div class="note-preview">
+          ${note.content.substring(0, 100)}${note.content.length > 100 ? '...' : ''}
+        </div>
+        <div class="note-meta">
+          <small>${new Date(note.created).toLocaleDateString()}</small>
+          <div class="note-actions">
+            <button class="edit-note">✏️</button>
+            <button class="delete-note">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<div class="empty-state"><p>📝 Нет заметок. Создай первую!</p></div>';
+
+    document.querySelector('.notes-count').textContent = `(${filtered.length})`;
+  }
+
+  bindEvents() {
+    // Поиск
+    document.querySelector('#notes-search').oninput = (e) => {
+      this.renderNotes(e.target.value);
+    };
+
+    // Add note
+    document.querySelector('.add-note-btn').onclick = () => {
+      this.showEditor();
+    };
+
+    // Save
+    document.querySelector('#note-save').onclick = () => this.saveNote();
+
+    // Cancel
+    document.querySelector('#note-cancel').onclick = () => {
+      this.hideEditor();
+      this.clearEditor();
+    };
+
+    // Card actions
+    document.querySelector('.notes-grid').addEventListener('click', (e) => {
+      const card = e.target.closest('.note-card');
+      if (!card) return;
+
+      const index = parseInt(card.dataset.index);
+      
+      if (e.target.closest('.edit-note')) {
+        this.editNote(index);
+      } else if (e.target.closest('.delete-note')) {
+        this.deleteNote(index);
+      }
+    });
+  }
+
+  showEditor(editIndex = null) {
+    this.editingIndex = editIndex;
+    document.querySelector('.note-editor').style.display = 'block';
+    document.querySelector('#note-content').focus();
     
-    async init() {
-        this.notes = await window.DataService.getNotes() || [
-            {id:1, content:'Первая заметка о проекте', type:'text', date: new Date().toISOString()},
-            {id:2, content:'Купить молоко завтра', type:'reminder', date: new Date(Date.now() - 86400000).toISOString()}
-        ];
-        console.log('📔 Notes:', this.notes.length);
+    if (editIndex !== null) {
+      document.querySelector('#note-content').value = this.notes[editIndex].content;
+      document.querySelector('#note-save').textContent = '✏️ Обновить';
     }
-    
-    render(container) {
-        container.innerHTML = `
-            <div style="max-width:900px;margin:0 auto">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
-                    <div>
-                        <h1 style="font-size:2.5rem;margin:0;color:#1f2937">📔 Заметки</h1>
-                        <p style="color:#6b7280;margin:0.5rem 0 0 0">Быстрые записи и напоминания</p>
-                    </div>
-                    <div style="text-align:right">
-                        <span style="font-size:1.5rem;font-weight:bold;color:#3b82f6">${this.notes.length}</span>
-                        <div style="color:#6b7280;font-size:0.9rem">заметок</div>
-                    </div>
-                </div>
-                
-                <form id="note-form" style="background:white;padding:2rem;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1);margin-bottom:2rem">
-                    <div style="display:flex;gap:1rem;align-items:end">
-                        <textarea id="note-content" rows="3" style="flex:1;padding:1.25rem;font-size:1.1rem;border:2px solid #e5e7eb;border-radius:16px;font-family:monospace;resize:vertical;min-height:120px" placeholder="Впиши заметку... (Enter для новой строки)" required></textarea>
-                        <select id="note-type" style="padding:1rem;font-size:1rem;border:2px solid #e5e7eb;border-radius:16px;background:white">
-                            <option value="text">📄 Текст</option>
-                            <option value="reminder">⏰ Напоминание</option>
-                            <option value="idea">💡 Идея</option>
-                            <option value="important">🔥 Важно</option>
-                        </select>
-                        <button type="submit" style="padding:1.25rem 1.5rem;font-size:1.1rem;font-weight:600;border:none;border-radius:16px;background:#3b82f6;color:white;cursor:pointer;box-shadow:0 4px 15px rgba(59,130,246,0.4)">💾 Сохранить</button>
-                    </div>
-                </form>
-                
-                <div style="display:grid;gap:1.5rem">
-                    ${this.notes.map(note => `
-                        <div style="background:white;border-radius:20px;padding:2rem;box-shadow:0 10px 40px rgba(0,0,0,0.08);position:relative;transition:transform 0.3s">
-                            <div class="note-header" style="display:flex;justify-content:space-between;align-items:start;gap:1rem;margin-bottom:1rem">
-                                <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
-                                    <span style="background:#3b82f6;color:white;padding:0.5rem 1rem;border-radius:25px;font-size:0.85rem;font-weight:500">${note.type}</span>
-                                    <span style="color:#6b7280;font-size:0.9rem">${new Date(note.date).toLocaleString('ru', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'})}</span>
-                                </div>
-                                <button onclick="NotesModule.delete(${note.id})" style="width:40px;height:40px;border-radius:50%;border:none;background:#ef4444;color:white;font-size:1.2rem;cursor:pointer;font-weight:bold;box-shadow:0 4px 12px rgba(239,68,68,0.3)" title="Удалить">×</button>
-                            </div>
-                            <div class="note-content" style="font-size:1.1rem;line-height:1.6;color:#1f2937;white-space:pre-wrap">${note.content}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        // Events
-        document.getElementById('note-form').onsubmit = async e => {
-            e.preventDefault();
-            const content = document.getElementById('note-content').value;
-            const type = document.getElementById('note-type').value;
-            const noteId = await window.DataService.saveNote({content, type});
-            this.notes.unshift({id: noteId, content, type, date: new Date().toISOString()});
-            this.render(container);
-            e.target.reset();
-        };
+  }
+
+  hideEditor() {
+    document.querySelector('.note-editor').style.display = 'none';
+    this.clearEditor();
+  }
+
+  clearEditor() {
+    document.querySelector('#note-content').value = '';
+    document.querySelector('#note-save').textContent = '💾 Сохранить';
+    this.editingIndex = null;
+  }
+
+  saveNote() {
+    const content = document.querySelector('#note-content').value.trim();
+    if (!content) return;
+
+    if (this.editingIndex !== null) {
+      // Edit
+      this.notes[this.editingIndex].content = content;
+      this.notes[this.editingIndex].updated = new Date().toISOString();
+    } else {
+      // New
+      this.notes.push({
+        content,
+        created: new Date().toISOString(),
+        updated: new Date().toISOString()
+      });
     }
-    
-    static async delete(id) {
-        console.log('🗑️ Удалить заметку:', id);
-        // DataService.deleteNote(id)
+
+    this.save();
+    this.renderNotes();
+    this.hideEditor();
+  }
+
+  editNote(index) {
+    this.showEditor(index);
+  }
+
+  deleteNote(index) {
+    if (confirm('Удалить заметку?')) {
+      this.notes.splice(index, 1);
+      this.save();
+      this.renderNotes();
     }
+  }
+
+  save() {
+    localStorage.setItem('notes', JSON.stringify(this.notes));
+  }
 }
 
-window.NotesModule = new NotesModule();
-window.Core.registerModule('notes', window.NotesModule);
-console.log('✅ NotesModule готов');
+window.Core.registerModule('notes', new NotesModule());

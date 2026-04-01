@@ -1,80 +1,146 @@
 class TasksModule {
-    constructor() {
-        this.tasks = [];
-    }
+  constructor() {
+    this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    this.points = parseInt(localStorage.getItem('tasksPoints')) || 0;
+  }
+
+  async init() {
+    this.save();
+  }
+
+  render(container) {
+    container.innerHTML = `
+      <div class="tasks-header">
+        <h2>📝 Задачи <span class="points">(${this.points} очков)</span></h2>
+        <button class="add-task-btn">➕ Новая задача</button>
+      </div>
+      <div class="tasks-list"></div>
+      <div class="tasks-form" style="display:none;">
+        <input id="task-title" placeholder="Название задачи" />
+        <textarea id="task-desc" placeholder="Описание"></textarea>
+        <div class="form-actions">
+          <button id="task-save">Сохранить</button>
+          <button id="task-cancel">Отмена</button>
+        </div>
+      </div>
+    `;
+
+    this.renderTasks();
+    this.bindEvents();
+  }
+
+  renderTasks() {
+    const list = document.querySelector('.tasks-list');
+    list.innerHTML = this.tasks.map((task, i) => `
+      <div class="task-item ${task.done ? 'done' : ''}" data-index="${i}">
+        <div class="task-checkbox">
+          <input type="checkbox" ${task.done ? 'checked' : ''}>
+        </div>
+        <div class="task-content">
+          <h3>${task.title}</h3>
+          <p>${task.desc}</p>
+          <small>${new Date(task.created).toLocaleDateString()}</small>
+        </div>
+        <div class="task-actions">
+          <button class="edit-task">✏️</button>
+          <button class="delete-task">🗑️</button>
+        </div>
+      </div>
+    `).join('') || '<p style="text-align:center;color:#666;">Нет задач. Добавьте первую!</p>';
+  }
+
+  bindEvents() {
+    // Add task
+    document.querySelector('.add-task-btn').onclick = () => {
+      document.querySelector('.tasks-form').style.display = 'block';
+      document.querySelector('#task-title').focus();
+    };
+
+    // Save task
+    document.querySelector('#task-save').onclick = () => this.saveTask();
+
+    // Cancel
+    document.querySelector('#task-cancel').onclick = () => {
+      document.querySelector('.tasks-form').style.display = 'none';
+      this.clearForm();
+    };
+
+    // Task interactions
+    document.querySelector('.tasks-list').addEventListener('click', (e) => {
+      const item = e.target.closest('.task-item');
+      if (!item) return;
+
+      const index = parseInt(item.dataset.index);
+      
+      if (e.target.closest('.task-checkbox input')) {
+        this.toggleTask(index);
+      } else if (e.target.closest('.edit-task')) {
+        this.editTask(index);
+      } else if (e.target.closest('.delete-task')) {
+        this.deleteTask(index);
+      }
+    });
+  }
+
+  saveTask() {
+    const title = document.querySelector('#task-title').value.trim();
+    const desc = document.querySelector('#task-desc').value.trim();
     
-    async init() {
-        this.tasks = await window.DataService.getTasks();
-        if (this.tasks.length === 0) {
-            this.tasks = [{id:1,title:'Первая задача ✅',type:'health',status:'completed'}];
-        }
-        console.log('📝 Tasks:', this.tasks.length);
-    }
+    if (!title) return;
+
+    this.tasks.push({
+      title, desc, done: false, 
+      created: new Date().toISOString()
+    });
+
+    this.save();
+    this.renderTasks();
+    document.querySelector('.tasks-form').style.display = 'none';
+    this.clearForm();
+  }
+
+  toggleTask(index) {
+    this.tasks[index].done = !this.tasks[index].done;
+    if (this.tasks[index].done) this.points += 10;
+    this.save();
+    this.renderTasks();
+  }
+
+  editTask(index) {
+    const task = this.tasks[index];
+    document.querySelector('#task-title').value = task.title;
+    document.querySelector('#task-desc').value = task.desc;
+    document.querySelector('.tasks-form').style.display = 'block';
     
-    render(container) {
-        container.innerHTML = `
-            <div style="max-width:900px;margin:0 auto">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem">
-                    <div>
-                        <h1 style="font-size:2.5rem;margin:0;color:#1f2937">📝 Мои задачи</h1>
-                        <p style="color:#6b7280;margin:0.5rem 0 0 0">Управляй задачами и набирай очки!</p>
-                    </div>
-                    <div style="text-align:right">
-                        <div style="font-size:1.5rem;font-weight:bold;color:#10b981">
-                            ${this.tasks.filter(t=>t.status==='completed').length}/${this.tasks.length}
-                        </div>
-                        <div style="color:#6b7280;font-size:0.9rem">выполнено</div>
-                    </div>
-                </div>
-                
-                <form id="task-form" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:2rem;border-radius:20px;color:white;box-shadow:0 20px 40px rgba(102,126,234,0.3);margin-bottom:2rem">
-                    <div style="display:flex;gap:1rem;align-items:end">
-                        <input id="task-title" style="flex:1;padding:1.25rem;font-size:1.1rem;border:none;border-radius:16px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1)" placeholder="Что нужно сделать сегодня?" required>
-                        <select id="task-type" style="padding:1rem;font-size:1rem;border:none;border-radius:16px;background:#5a67d8">
-                            <option value="health">💪 Здоровье (+20 очков)</option>
-                            <option value="household">🏠 Дом (+10 очков)</option>
-                            <option value="work">💼 Работа (+15 очков)</option>
-                        </select>
-                        <button type="submit" style="padding:1.25rem 2rem;font-size:1.1rem;font-weight:600;border:none;border-radius:16px;background:#10b981;color:white;cursor:pointer;box-shadow:0 4px 15px rgba(16,185,129,0.4)">➕ Создать</button>
-                    </div>
-                </form>
-                
-                <div style="display:grid;gap:1.5rem">
-                    ${this.tasks.map(task => `
-                        <div style="background:white;border-radius:20px;padding:2rem;box-shadow:0 10px 40px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s;border-left:6px solid ${task.status==='completed'?'#10b981':'#6366f1'}">
-                            <div style="display:flex;justify-content:space-between;align-items:start;gap:1rem">
-                                <div style="flex:1">
-                                    <h3 style="margin:0 0 0.5rem 0;font-size:1.4rem;color:#1f2937">${task.title}</h3>
-                                    <div style="display:flex;gap:1rem">
-                                        <span style="background:${task.type==='health'?'#10b981':task.type==='household'?'#f59e0b':'#6366f1'};color:white;padding:0.5rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:500">${task.type}</span>
-                                        <span style="color:#6b7280;font-size:0.9rem">${new Date(task.date||Date.now()).toLocaleDateString('ru')}</span>
-                                    </div>
-                                </div>
-                                <button onclick="TasksModule.toggle(${task.id})" style="width:60px;height:60px;border-radius:50%;border:none;background:${task.status==='completed'?'#10b981':'#6366f1'};color:white;font-size:1.5rem;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(99,102,241,0.4);transition:transform 0.2s" title="${task.status==='completed'?'Готово':'Выполнить'}">
-                                    ${task.status==='completed'?'✅':'○'}
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('task-form').onsubmit = async e => {
-            e.preventDefault();
-            const title = document.getElementById('task-title').value;
-            const type = document.getElementById('task-type').value;
-            const taskId = await window.DataService.saveTask({title, type, status: 'pending'});
-            this.tasks.push({id: taskId, title, type, status: 'pending', date: new Date().toISOString()});
-            this.render(container);
-            e.target.reset();
-        };
+    // Перехватываем save для edit
+    document.querySelector('#task-save').onclick = () => {
+      this.tasks[index].title = document.querySelector('#task-title').value;
+      this.tasks[index].desc = document.querySelector('#task-desc').value;
+      this.save();
+      this.renderTasks();
+      document.querySelector('.tasks-form').style.display = 'none';
+      this.clearForm();
+    };
+  }
+
+  deleteTask(index) {
+    if (confirm('Удалить задачу?')) {
+      this.tasks.splice(index, 1);
+      this.save();
+      this.renderTasks();
     }
-    
-    static async toggle(id) {
-        console.log('Toggle task:', id);
-    }
+  }
+
+  clearForm() {
+    document.querySelector('#task-title').value = '';
+    document.querySelector('#task-desc').value = '';
+  }
+
+  save() {
+    localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    localStorage.setItem('tasksPoints', this.points);
+    document.querySelector('.points').textContent = `(${this.points} очков)`;
+  }
 }
 
-window.TasksModule = new TasksModule();
-window.Core.registerModule('tasks', window.TasksModule);
+window.Core.registerModule('tasks', new TasksModule());
