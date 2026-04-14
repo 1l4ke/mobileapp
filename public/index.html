@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Dashboard</title>
-    <link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="../src/styles/main.css" type="text/css">
     <meta name="theme-color" content="#6366f1">
-    <base href="/">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+    <link rel="stylesheet" href="./src/styles/main.css" type="text/css">
+    <link rel="stylesheet" href="./src/modules/tasks/tasks.css" type="text/css">
+    <link rel="stylesheet" href="./src/modules/notes/notes.css" type="text/css">
+    <link rel="stylesheet" href="./src/modules/tracker/tracker.css" type="text/css">
+    <meta name="theme-color" content="#6366f1">
+    
+   
 </head>
 
 <body>
@@ -16,7 +23,7 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1>📊 Smart Dashboard</h1>
+                <h1>📊 Smart DAAshboard</h1>
                 <div class="user-profile" id="user-profile">
             <span id="user-display" class="user-display" style="margin-left:auto;padding:0.75rem 1.5rem;border-radius:12px;background:#f3f4f6;font-weight:500;font-size:0.95rem;white-space:nowrap;">Гость</span>
             <button onclick="logout()" style="margin-left:0.5rem;padding:0.5rem 1rem;background:#ef4444;color:white;border:none;border-radius:8px;font-size:0.9rem;cursor:pointer;">Выход</button>        
@@ -184,18 +191,18 @@ window.logout = function() {
     <!-- Относительные пути от public/ -->
     
     
-    <script src="../src/core/router.js"></script>
+    <script src="/src/core/router.js"></script>
     
-    <script src="../src/core/dataService.js"></script>
-    <script src="../src/core/notifications.js"></script>
-    <script src="../src/core/cacheService.js"></script>
-    <script src="../src/core/uiContainer.js"></script>
-    <script src="../src/modules/tasks/tasks.js"></script>
-    <script src="../src/modules/tasks/taskUI.js"></script>
-    <script src="../src/modules/notes/notes.js"></script>
-    <script src="../src/modules/notes/notesUI.js"></script>
-    <script src="../src/modules/tracker/tracker.js"></script>
-    <script src="../src/modules/tracker/trackerUI.js"></script>
+    <script src="/src/core/dataService.js"></script>
+    <script src="/src/core/notifications.js"></script>
+    <script src="/src/core/cacheService.js"></script>
+    <script src="/src/core/uiContainer.js"></script>
+    <script src="/src/modules/tasks/tasks.js"></script>
+    <script src="/src/modules/tasks/taskUI.js"></script>
+    <script src="/src/modules/notes/notes.js"></script>
+    <script src="/src/modules/notes/notesUI.js"></script>
+    <script src="/src/modules/tracker/tracker.js"></script>
+    <script src="/src/modules/tracker/trackerUI.js"></script>
     
     <script>
 async function init() {

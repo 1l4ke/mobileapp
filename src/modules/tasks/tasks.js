@@ -5,7 +5,7 @@ class TasksModule {
   }
 
   async init() {
-    this.save();
+  
   }
 
   render(container) {
@@ -138,8 +138,12 @@ class TasksModule {
 
   save() {
     localStorage.setItem('tasks', JSON.stringify(this.tasks));
-    localStorage.setItem('tasksPoints', this.points);
-    document.querySelector('.points').textContent = `(${this.points} очков)`;
+  localStorage.setItem('tasksPoints', String(this.points));
+
+  const pointsEl = this.container?.querySelector('.points');
+  if (pointsEl) {
+    pointsEl.textContent = `(${this.points} очков)`;
+  }
   }
 }
 

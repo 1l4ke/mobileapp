@@ -1,7 +1,40 @@
 {
   "name": "Smart Dashboard",
-  "short_name": "Dashboard", 
+  "short_name": "Dashboard",
+  "description": "📱 PWA для задач, заметок и трекинга привычек",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#6366f1"
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "lang": "ru",
+  "id": "/",
+  "icons": [
+    {
+      "src": "/icons/192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "/icons/screenshot1.png",
+      "sizes": "1170x2532",
+      "form_factor": "wide",
+      "label": "Tasks & Notes"
+    },
+    {
+      "src": "/icons/screenshot2.png",
+      "sizes": "1170x2532",
+      "label": "Trackers"
+    }
+  ]
 }

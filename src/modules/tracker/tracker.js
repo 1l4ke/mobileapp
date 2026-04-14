@@ -5,7 +5,7 @@ class TrackerModule {
   }
 
   async init() {
-    this.save();
+  
   }
 
   render(container) {
@@ -210,9 +210,14 @@ class TrackerModule {
   }
 
   save() {
-    localStorage.setItem('trackerEntries', JSON.stringify(this.entries));
-    document.getElementById('streak-count').textContent = this.streak;
+  localStorage.setItem('trackerEntries', JSON.stringify(this.entries));
+  
+  const streakEl = document.getElementById('streak-count');
+  if (streakEl) {
+    streakEl.textContent = this.streak;
   }
+}
+
 }
 
 window.Core.registerModule('tracker', new TrackerModule());
