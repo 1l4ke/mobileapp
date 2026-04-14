@@ -4,7 +4,11 @@ FROM nginx:alpine
 COPY public/ /usr/share/nginx/html/public/
 COPY src/ /usr/share/nginx/html/src/
 COPY public/manifest.json /usr/share/nginx/html/manifest.json
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+# ПЕРЕВОДИМ КОНФИГ В conf.d/default.conf, чтобы Nginx реально его юзал
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Удаляем дефолтный конфиг (если был)
+RUN rm -f /etc/nginx/conf.d/*.default
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
