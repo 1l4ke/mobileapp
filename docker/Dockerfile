@@ -7,8 +7,6 @@ COPY public/manifest.json /usr/share/nginx/html/manifest.json
 # ПЕРЕВОДИМ КОНФИГ В conf.d/default.conf, чтобы Nginx реально его юзал
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Удаляем дефолтный конфиг (если был)
-RUN rm -f /etc/nginx/conf.d/*.default
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
