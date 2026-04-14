@@ -1,23 +1,17 @@
 import express from "express";
-import cors from "cors";
-import authRoutes from "./authRoutes.js";
+import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import authRoutes from "./authRoutes.js";
 
 dotenv.config();
 
 const app = express();
+app.use(bodyParser.json());
 
-app.use(express.json());
-
-app.use("/api/auth", authRoutes);
+// авторизация /api/register, /api/login
 app.use("/api", authRoutes);
 
-// Health check
-app.get("/api/health", (req, res) => res.json({ status: "OK", time: new Date() }));
-
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🔐 Backend: http://localhost:${PORT}/api/health`);
-});
-
-app.use('/api', express.static('../client/build')); // frontend статика
+app.listen(PORT, () =>
+  console.log(`Auth server running on port ${PORT}`)
+);

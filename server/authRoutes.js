@@ -3,7 +3,6 @@ import { supabase } from "./db.js";
 
 const router = express.Router();
 
-// Регистрация пользователя
 router.post("/register", async (req, res) => {
   const { email, password } = req.body;
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -11,7 +10,6 @@ router.post("/register", async (req, res) => {
   res.json({ user: data.user });
 });
 
-// Логин пользователя
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
