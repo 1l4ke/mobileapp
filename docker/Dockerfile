@@ -5,5 +5,5 @@ COPY public/ /usr/share/nginx/html/public/
 COPY src/ /usr/share/nginx/html/src/
 COPY public/manifest.json /usr/share/nginx/html/manifest.json
 
-EXPOSE 3000
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
