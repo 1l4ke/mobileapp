@@ -10,6 +10,10 @@ class TrackerModule {
       {id:'sleep', name:'Сон (часы)', goal:8, icon:'😴'},
       {id:'walk', name:'Прогулка (км)', goal:5, icon:'🚶'}
     ];
+    const customHabits = localStorage.getItem('customHabits');
+    if (customHabits) {
+      this.habits = [...this.habits, ...JSON.parse(customHabits)];
+    }
   }
 
   render(container) {
@@ -154,14 +158,6 @@ saveNewHabit() {
   this.showNotification('✅ Новая привычка добавлена!');
 }
 
-// Загрузка кастомных привычек при init
-constructor() {
-  // ... существующий код ...
-  const customHabits = localStorage.getItem('customHabits');
-  if (customHabits) {
-    this.habits = [...this.habits, ...JSON.parse(customHabits)];
-  }
-}
 
 // Уведомление (добавьте метод)
 showNotification(message) {
