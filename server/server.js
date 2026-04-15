@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cors from "cors";  // npm i cors
 import dotenv from "dotenv";
 import authRoutes from "./authRoutes.js";
 
