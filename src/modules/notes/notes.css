@@ -354,3 +354,7 @@
   background: #dc2626;
   transform: scale(1.1);
 }
+/* Тёмная тема */
+[data-theme="dark"] #note-content,
+[data-theme="dark"] .note-form textarea { background: var(--bg-secondary) !important; color: var(--text-primary) !important; }
+[data-theme="dark"] .note-card { background: var(--bg-secondary) !important; border-color: var(--border) !important; }

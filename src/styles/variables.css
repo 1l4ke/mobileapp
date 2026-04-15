@@ -20,3 +20,11 @@
   --text-primary: #f1f5f9; --text-secondary: #94a3b8;
   --border: #334155; --shadow: 0 4px 6px -1px rgba(255,255,255,0.1);
 }
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --shadow: 0 4px 6px -1px rgba(255,255,255,0.05);
+}

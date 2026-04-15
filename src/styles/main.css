@@ -405,3 +405,69 @@ body {
 .form-row { display: flex; gap: 1rem; }
 .form-row input, .form-row select { flex: 1; }
 #progress-chart { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white; }
+/* Тёмная тема для форм */
+[data-theme="dark"] .note-form,
+[data-theme="dark"] .task-form,
+[data-theme="dark"] .entry-form,
+[data-theme="dark"] .note-editor,
+[data-theme="dark"] .tasks-form {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .note-form textarea,
+[data-theme="dark"] .task-form input,
+[data-theme="dark"] .task-form textarea,
+[data-theme="dark"] #note-content,
+[data-theme="dark"] #task-title,
+[data-theme="dark"] #task-desc {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .note-form textarea:focus,
+[data-theme="dark"] .task-form input:focus,
+[data-theme="dark"] .task-form textarea:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+[data-theme="dark"] .form-row input,
+[data-theme="dark"] .form-row select {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .note-card,
+[data-theme="dark"] .task-card,
+[data-theme="dark"] .habit-card,
+[data-theme="dark"] .stat-card {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .note-preview,
+[data-theme="dark"] .note-meta,
+[data-theme="dark"] .task-content {
+  color: var(--text-secondary) !important;
+}
+
+/* Тексты и placeholders */
+[data-theme="dark"] ::placeholder {
+  color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .habit-name,
+[data-theme="dark"] .stat-label {
+  color: var(--text-secondary) !important;
+}
+
+/* Progress bars и т.д. */
+[data-theme="dark"] .progress-bar,
+[data-theme="dark"] .progress-section {
+  background: var(--border) !important;
+}
