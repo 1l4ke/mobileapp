@@ -27,14 +27,14 @@
   "screenshots": [
     {
       "src": "/icons/screenshot1.png",
-      "sizes": "1170x2532",
+      "sizes": "620x1280",
       "form_factor": "wide",
-      "label": "Tasks & Notes"
+      "label": "Login"
     },
     {
       "src": "/icons/screenshot2.png",
-      "sizes": "1170x2532",
-      "label": "Trackers"
+      "sizes": "644x1280",
+      "label": "Tracker"
     }
   ]
 }
