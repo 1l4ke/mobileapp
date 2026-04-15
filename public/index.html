@@ -24,17 +24,20 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1>📊 Smart DAAshboard</h1>
-                <div class="user-profile">
-  <span id="user-display" class="user-display">Гость</span>
-  <button onclick="logout()" class="logout-btn">Выход</button>
-  <label class="theme-toggle">
-    <input type="checkbox" id="themeSwitch">
-    <span class="slider"></span>
-  </label>
-  <div class="points-display">...</div>
+  <h1>📊 Smart Dashboard</h1>
+  <div class="user-profile" id="user-profile">
+    <span id="user-display" class="user-display" style="padding:0.75rem 1rem;border-radius:12px;background:#f3f4f6;font-weight:500;font-size:0.95rem;">Гость</span>
+    <button onclick="logout()" class="logout-btn" style="padding:0.5rem 1rem;background:#ef4444;color:white;border:none;border-radius:8px;font-size:0.9rem;cursor:pointer;">Выход</button>
+    <label class="theme-toggle">
+      <input type="checkbox" id="themeSwitch">
+      <span class="slider"></span>
+    </label>
+    <div class="points-display">
+      <span class="points-label">баллов</span>
+      <span id="total-points" class="points-value">0</span>
+    </div>
+  </div>
 </div>
-            </div>
         </header>
 
         <!-- Navigation -->
