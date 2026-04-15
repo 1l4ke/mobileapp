@@ -94,9 +94,83 @@ class TrackerModule {
   }
 
   showHabitEditor() {
-    // Простая модалка для новых привычек (опционально)
-    alert('Добавление новой привычки в разработке! Используйте существующие.');
+  // Создаём модалку если нет
+  let modal = document.querySelector('.habit-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.className = 'habit-modal';
+    modal.innerHTML = `
+      <div class="habit-modal-content">
+        <h3>➕ Новая привычка</h3>
+        <div class="habit-form-row">
+          <input id="new-habit-name" placeholder="Название (Сон, Спорт...)">
+          <input id="new-habit-goal" type="number" min="1" placeholder="Цель (8, 30...)">
+        </div>
+        <div class="habit-form-row">
+          <input id="new-habit-icon" placeholder="Иконка (😴, 💧...)">
+        </div>
+        <div class="modal-actions">
+          <button class="modal-cancel" onclick="window.TrackerInstance.closeHabitModal()">Отмена</button>
+          <button class="modal-save" onclick="window.TrackerInstance.saveNewHabit()">Добавить</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
   }
+  modal.classList.add('active');
+  document.getElementById('new-habit-name').focus();
+}
+
+closeHabitModal() {
+  const modal = document.querySelector('.habit-modal');
+  if (modal) modal.classList.remove('active');
+}
+
+saveNewHabit() {
+  const name = document.getElementById('new-habit-name').value.trim();
+  const goal = parseFloat(document.getElementById('new-habit-goal').value) || 1;
+  const icon = document.getElementById('new-habit-icon').value.trim() || '⭐';
+
+  if (!name) {
+    alert('Введите название привычки!');
+    return;
+  }
+
+  // Добавляем в массив привычек
+  this.habits.push({id: name.toLowerCase().replace(/\s+/g, '_'), name, goal, icon});
+  
+  // Сохраняем в localStorage
+  localStorage.setItem('customHabits', JSON.stringify(this.habits));
+  
+  this.renderHabits();
+  this.closeHabitModal();
+  
+  // Очищаем форму
+  document.getElementById('new-habit-name').value = '';
+  document.getElementById('new-habit-goal').value = '';
+  document.getElementById('new-habit-icon').value = '';
+  
+  // Уведомление
+  this.showNotification('✅ Новая привычка добавлена!');
+}
+
+// Загрузка кастомных привычек при init
+constructor() {
+  // ... существующий код ...
+  const customHabits = localStorage.getItem('customHabits');
+  if (customHabits) {
+    this.habits = [...this.habits, ...JSON.parse(customHabits)];
+  }
+}
+
+// Уведомление (добавьте метод)
+showNotification(message) {
+  const notif = document.createElement('div');
+  notif.className = 'notification notification--success';
+  notif.textContent = message;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 3000);
+}
 
   bindEvents() {
     // Пустой - события через window.TrackerInstance

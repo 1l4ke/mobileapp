@@ -430,3 +430,31 @@
 .day-stats { background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); }
 .stat-item { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
 .stat-item:last-child { border-bottom: none; }
+/* Фикс тёмной темы */
+[data-theme="dark"] .habit-card,
+[data-theme="dark"] .habit-card input { 
+  background: var(--bg-secondary) !important; 
+  color: var(--text-primary) !important; 
+  border-color: var(--border) !important; 
+}
+
+/* Модалка новой привычки */
+.habit-modal {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+  background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+.habit-modal.active { opacity: 1; visibility: visible; }
+.habit-modal-content {
+  background: var(--bg-secondary); padding: 2rem; border-radius: var(--radius); max-width: 400px; width: 90%; 
+  box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto; color: var(--text-primary);
+  transform: scale(0.8); transition: transform 0.3s ease;
+}
+.habit-modal.active .habit-modal-content { transform: scale(1); }
+.habit-modal h3 { margin-bottom: 1.5rem; text-align: center; }
+.habit-form-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.habit-form-row input { flex: 1; padding: 1rem; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem; }
+.habit-form-row input:focus { border-color: #6366f1; outline: none; }
+.modal-actions { display: flex; gap: 1rem; justify-content: flex-end; }
+.modal-save { background: var(--success); color: white; padding: 1rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.modal-cancel { background: transparent; color: var(--text-secondary); padding: 1rem 2rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; }
