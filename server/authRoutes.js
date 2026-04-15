@@ -17,4 +17,7 @@ router.post("/login", async (req, res) => {
   res.json({ session: data.session });
 });
 
+router.get("/test", (req, res) => {
+  res.json({ ok: true, time: new Date().toISOString() });
+});
 export default router;
