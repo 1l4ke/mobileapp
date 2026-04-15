@@ -590,3 +590,65 @@ body {
     font-size: 1.5rem !important;
   }
 }
+
+/* ✅ ТОЧНЫЙ фикс только auth формы */
+#auth-root {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease;
+}
+
+#auth-root > div {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+#auth-root h1,
+#auth-root p,
+#auth-root label {
+  color: var(--text-primary) !important;
+}
+
+#auth-root input {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--border) !important;
+  caret-color: var(--text-primary) !important;
+}
+
+#auth-root input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+}
+
+#auth-root input::placeholder {
+  color: var(--text-secondary) !important;
+}
+
+#auth-root button {
+  background: #6366f1 !important;
+  color: white !important;
+}
+
+#auth-root #auth-message {
+  color: var(--text-primary) !important;
+}
+
+/* Tracker header точечно */
+.tracker-header {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.tracker-header h2 {
+  color: var(--text-primary) !important;
+}
+
+.tracker-header input[type="date"] {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 2px solid var(--border) !important;
+}
