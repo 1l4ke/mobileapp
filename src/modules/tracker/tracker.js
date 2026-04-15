@@ -9,59 +9,21 @@ class TrackerModule {
   }
 
   render(container) {
-    container.innerHTML = `
-      <div class="tracker-header">
-        <div class="streak-display">
-          <h2>🔥 Стрик: <span id="streak-count">${this.streak}</span> дней</h2>
-          <div class="streak-badge">Продолжай!</div>
-        </div>
-        <button class="add-entry-btn">➕ Добавить день</button>
+  container.innerHTML = `
+    <div class="tracker-header">
+      <div>
+        <h2>📈 Привычки</h2>
+        <input type="date" id="datePicker" onchange="TrackerModule.loadDay()" style="margin-top:0.5rem;padding:0.75rem;border:2px solid var(--border);border-radius:8px;">
       </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Всего дней</h3>
-          <div class="stat-number">${this.entries.length}</div>
-        </div>
-        <div class="stat-card">
-          <h3>Успешных</h3>
-          <div class="stat-number">${this.entries.filter(e => e.success).length}</div>
-        </div>
-        <div class="stat-card">
-          <h3>Уровень</h3>
-          <div class="stat-number level">${Math.floor(this.entries.filter(e => e.success).length / 10)}</div>
-        </div>
-      </div>
-
-      <canvas id="progress-chart" width="400" height="200"></canvas>
-
-      <div class="entries-list">
-        <!-- Динамически -->
-      </div>
-
-      <div class="entry-form" style="display:none;">
-        <div class="form-row">
-          <input id="entry-date" type="date" />
-          <select id="entry-success">
-            <option value="success">✅ Успех</option>
-            <option value="fail">❌ Провал</option>
-            <option value="skip">⏭️ Пропуск</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <textarea id="entry-notes" placeholder="Заметки за день..."></textarea>
-        </div>
-        <div class="form-actions">
-          <button id="entry-save">Сохранить</button>
-          <button id="entry-cancel">Отмена</button>
-        </div>
-      </div>
-    `;
-
-    this.renderEntries();
-    this.renderChart();
-    this.bindEvents();
-  }
+      <button class="add-entry-btn" onclick="TrackerModule.showHabitEditor()">➕ Добавить</button>
+    </div>
+    <div class="habits-grid" id="habitsGrid"></div>
+    <div class="day-stats" id="dayStats"></div>
+  `;
+  this.renderHabits();
+  this.loadDay(); // Текущий день по умолчанию
+  this.bindEvents();
+}
 
   renderEntries() {
     const list = document.querySelector('.entries-list');
@@ -217,7 +179,72 @@ class TrackerModule {
     streakEl.textContent = this.streak;
   }
 }
+habits = [
+  {id:'water', name:'Вода (л)', goal:2, icon:'💧'},
+  {id:'sport', name:'Спорт (мин)', goal:30, icon:'💪'},
+  {id:'reading', name:'Чтение (стр)', goal:20, icon:'📖'},
+  {id:'sleep', name:'Сон (часы)', goal:8, icon:'😴'}, // Новое
+  {id:'walk', name:'Прогулка (км)', goal:5, icon:'🚶'} // Новое
+];
 
+renderHabits() {
+  const grid = document.getElementById('habitsGrid');
+  grid.innerHTML = this.habits.map(habit => {
+    const todayData = this.getTodayHabit(habit.id);
+    const progress = todayData ? (todayData.value / habit.goal * 100) : 0;
+    return `
+      <div class="habit-card">
+        <div class="habit-icon">${habit.icon}</div>
+        <div class="habit-name">${habit.name}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="habit-value">${todayData?.value || 0}/${habit.goal}</div>
+        <input type="number" min="0" max="${habit.goal*2}" value="${todayData?.value || ''}" onchange="TrackerModule.updateHabit('${habit.id}', this.value)" placeholder="0">
+        <button onclick="TrackerModule.resetHabit('${habit.id}')">Сброс</button>
+      </div>
+    `;
+  }).join('');
+}
+
+getTodayHabit(habitId) {
+  const today = new Date().toDateString();
+  const data = localStorage.getItem(`${habitId}_${today}`);
+  return data ? JSON.parse(data) : null;
+}
+
+updateHabit(id, value) {
+  const today = new Date().toDateString();
+  const habit = this.habits.find(h => h.id === id);
+  localStorage.setItem(`${id}_${today}`, JSON.stringify({value: parseFloat(value)||0, date: today}));
+  this.renderHabits();
+}
+
+resetHabit(id) {
+  const today = new Date().toDateString();
+  localStorage.removeItem(`${id}_${today}`);
+  this.renderHabits();
+}
+
+loadDay() {
+  const date = document.getElementById('datePicker').value;
+  const dateStr = date ? new Date(date).toDateString() : new Date().toDateString();
+  const stats = document.getElementById('dayStats');
+  
+  let html = `<h3>📅 ${new Date(dateStr).toLocaleDateString('ru-RU')} (${habits.length} привычек)</h3>`;
+  let completed = 0;
+  this.habits.forEach(habit => {
+    const data = localStorage.getItem(`${habit.id}_${dateStr}`);
+    if (data) {
+      const val = JSON.parse(data).value;
+      const done = val >= habit.goal;
+      completed += done ? 1 : 0;
+      html += `<div class="stat-item"><span>${habit.icon} ${habit.name}</span><span>${val}/${habit.goal} ${done ? '✅' : '❌'}</span></div>`;
+    }
+  });
+  html += `<div style="margin-top:1rem;padding:1rem;background:var(--success);color:white;border-radius:8px;">Завершено: ${completed}/${this.habits.length}</div>`;
+  stats.innerHTML = html;
+}
+
+showHabitEditor() { /* модалка если нужно */ }
 }
 
 window.Core.registerModule('tracker', new TrackerModule());

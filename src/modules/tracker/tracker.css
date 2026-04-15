@@ -414,3 +414,19 @@
   color: #374151;
   font-weight: 500;
 }
+.habits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.habit-card { 
+  background: var(--bg-secondary); border-radius: var(--radius); padding: 1.5rem; text-align: center; 
+  box-shadow: var(--shadow); border: 1px solid var(--border); transition: all 0.3s;
+}
+.habit-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+.habit-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.habit-name { font-weight: 600; margin-bottom: 0.75rem; font-size: 0.95rem; }
+.progress-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin: 0.75rem 0; }
+.progress-fill { height: 100%; background: var(--success); transition: width 0.5s ease; border-radius: 4px; }
+.habit-value { font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; }
+.habit-card input { width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; text-align: center; }
+.habit-card button { width: 100%; padding: 0.5rem; background: var(--danger); color: white; border: none; border-radius: 8px; cursor: pointer; }
+.day-stats { background: var(--bg-secondary); padding: 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.stat-item { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.stat-item:last-child { border-bottom: none; }

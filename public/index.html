@@ -9,6 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-192.png">
     <link rel="stylesheet" href="./src/styles/main.css" type="text/css">
+    <link rel="stylesheet" href="./src/styles/variables.css">
     <link rel="stylesheet" href="./src/modules/tasks/tasks.css" type="text/css">
     <link rel="stylesheet" href="./src/modules/notes/notes.css" type="text/css">
     <link rel="stylesheet" href="./src/modules/tracker/tracker.css" type="text/css">
@@ -24,14 +25,15 @@
         <header class="header">
             <div class="header-content">
                 <h1>📊 Smart DAAshboard</h1>
-                <div class="user-profile" id="user-profile">
-            <span id="user-display" class="user-display" style="margin-left:auto;padding:0.75rem 1.5rem;border-radius:12px;background:#f3f4f6;font-weight:500;font-size:0.95rem;white-space:nowrap;">Гость</span>
-            <button onclick="logout()" style="margin-left:0.5rem;padding:0.5rem 1rem;background:#ef4444;color:white;border:none;border-radius:8px;font-size:0.9rem;cursor:pointer;">Выход</button>        
-            <div class="points-display">
-                        <span class="points-label">баллов</span>
-                        <span id="total-points" class="points-value">0</span>
-                    </div>
-                </div>
+                <div class="user-profile">
+  <span id="user-display" class="user-display">Гость</span>
+  <button onclick="logout()" class="logout-btn">Выход</button>
+  <label class="theme-toggle">
+    <input type="checkbox" id="themeSwitch">
+    <span class="slider"></span>
+  </label>
+  <div class="points-display">...</div>
+</div>
             </div>
         </header>
 
@@ -225,6 +227,20 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js')
     .then(reg => console.log('✅ SW registered'))
     .catch(err => console.log('❌ SW failed:', err));
+}
+</script>
+<script>
+const themeSwitch = document.getElementById('themeSwitch');
+if (themeSwitch) {
+  const html = document.documentElement;
+  const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  html.setAttribute('data-theme', savedTheme);
+  themeSwitch.checked = savedTheme === 'dark';
+  themeSwitch.onchange = () => {
+    const theme = themeSwitch.checked ? 'dark' : 'light';
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  };
 }
 </script>
 </body>
