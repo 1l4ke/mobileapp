@@ -12,10 +12,28 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return res.status(400).json({ error: error.message });
-  res.json({ session: data.session });
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email и пароль обязательны" });
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    console.log("Supabase result:", { data, error });
+
+    if (error) {
+      return res.status(400).json({ error: error.message });
+    }
+    if (!data || !data.session) {
+      return res.status(400).json({ error: "Invalid session" });
+    }
+
+    res.json({ session: data.session });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
 
 router.get("/test", (req, res) => {
   res.json({ ok: true, time: new Date().toISOString() });

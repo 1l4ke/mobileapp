@@ -6,7 +6,7 @@ import authRoutes from "./authRoutes.js";
 dotenv.config();
 
 const app = express();
-app.use(bodyParser.json());
+app.use(express.json());
 
 // авторизация /api/register, /api/login
 app.use("/api", authRoutes);

@@ -127,13 +127,17 @@ form.onsubmit = async (e) => {
     
     const url = mode === 'register' ? '/api/register' : '/api/login';
     const res = await fetch(url, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email, password})
-    });
-    
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Ошибка');
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ email, password }),
+});
+
+if (!res.ok) {
+  const text = await res.text();
+  throw new Error(`HTTP ${res.status} ${res.statusText}: ${text}`);
+}
+
+const data = await res.json();
     
     message.innerHTML = mode === 'register' 
       ? '✅ Регистрация OK. Проверь почту.' 
